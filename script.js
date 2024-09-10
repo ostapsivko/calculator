@@ -1,63 +1,69 @@
-function add(x, y) {
-    return x + y;
-}
+let calculator = {
+    add: function (x, y) {
+        return x + y;
+    },
 
-function subtract(x, y) {
-    return x - y;
-}
+    subtract: function (x, y) {
+        return x - y;
+    },
 
-function multiply(x, y) {
-    return x * y;
-}
+    multiply: function(x, y) {
+        return x * y;
+    },
 
-function divide(x, y) {
-    return x / y;
-}
+    divide: function (x, y) {
+        return x / y;
+    },
 
-function operate(op1, op2, operator) {
-    switch(operator) {
-        case "+":
-            return add(op1, op2);
-        case "-":
-            return subtract(op1, op2);
-        case "*":
-            return multiply(op1, op2);
-        case "/":
-            return divide(op1, op2);
+    operate: function (operation) {
+        switch(operation.operator) {
+            case "+":
+                return this.add(Number(operation.first), Number(operation.second));
+            case "-":
+                return this.subtract(Number(operation.first), Number(operation.second));
+            case "*":
+                return this.multiply(Number(operation.first), Number(operation.second));
+            case "/":
+                return this.divide(Number(operation.first), Number(operation.second));
+        }
+    },
+    
+    updateDisplayValue: function (value) {
+        display.value = value;
+    },
+
+    newOperation: function() {
+        return {
+            first: "",
+            second: "",
+            operator: "",
+        }
     }
-}
+};
 
-const display = document.querySelector(".display");
-const numbers = document.querySelector(".numbers");
-const operations = document.querySelector(".operations");
+calculator.display = display = document.querySelector(".display");
+calculator.numbers = document.querySelector(".numbers");
+calculator.operations = document.querySelector(".operations");
 
 let input = "";
-let first = "";
-let second = "";
-let operator = "";
+let operation = calculator.newOperation();
 
-numbers.addEventListener("click", (e) => {
-    if(e.target !== numbers) {
+calculator.numbers.addEventListener("click", (e) => {
+    if(e.target !== calculator.numbers) {
         input += e.target.innerText;
-        updateDisplayValue(input);
+        calculator.updateDisplayValue(input);
     }
 });
 
-operations.addEventListener("click", (e) => {
+calculator.operations.addEventListener("click", (e) => {
     if(e.target.innerText === "=") {
-        second = input;
-        let result = operate(Number(first), Number(second), operator);
-        updateDisplayValue(result);
-    } else if(e.target !== operations) {
-        first = input;
-        input = operator = e.target.innerText;
-
-        updateDisplayValue(input);
-
+        operation.second = input;
+        let result = calculator.operate(operation);
+        calculator.updateDisplayValue(result);
+    } else if(e.target !== calculator.operations) {
+        operation.first = input;
+        input = operation.operator = e.target.innerText;
+        calculator.updateDisplayValue(input);
         input = "";
     }
 });
-
-function updateDisplayValue(value) {
-    display.value = value;
-}
