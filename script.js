@@ -45,10 +45,19 @@ class Calculator {
         this.operations = new Operations();
         this.operation = this.operations.newOperation();
 
+        this.handleOperationCompletion = function() {
+            this.operation.second = this.display.input;
+            
+            let result = this.operate(this.operation);
+            
+            this.operation = this.operations.newOperation();
+            this.display.input = this.operation.first = result
+            this.display.updateDisplayValue();
+            this.display.input = "";
+        }
+
         this.operations.element.addEventListener("click", (e) => {
             if(e.target !== this.operations.element) {
-                // if(this.)
-
                 if(e.target.innerText === "=") {
                     if(!this.operation || !this.operation.operator) {
                         this.display.input = "ERROR";
@@ -56,19 +65,16 @@ class Calculator {
                         return;
                     }
 
-                    this.operation.second = this.display.input;
-                    
-                    let result = this.operate(this.operation);
-                    
-                    this.operation = this.operations.newOperation();
-                    this.display.input = this.operation.first = result;
-
-                    this.display.updateDisplayValue();
+                    this.handleOperationCompletion();
                 } else {
-                    this.operation.first = this.display.input;
-                    
+                    if(this.operation.first) {
+                        this.handleOperationCompletion();
+                    } else {
+                        this.operation.first = this.display.input;
+                    }
+
                     this.display.input = this.operation.operator = e.target.innerText;
-                    this.display.updateDisplayValue();
+                    this.display.showOperationResult(`${this.operation.first} ${this.operation.operator} ${this.operation.second}`);
                     this.display.input = "";
                 }
             }
@@ -107,6 +113,10 @@ class Display {
         this.updateDisplayValue = function () {
             this.element.value = this.input;
         };
+
+        this.showOperationResult = function(value) {
+            this.element.value = value;
+        } 
     }
 }
 
