@@ -47,15 +47,22 @@ class Calculator {
 
         this.operations.element.addEventListener("click", (e) => {
             if(e.target !== this.operations.element) {
-                if(!this.operation) {
-                    this.display.input = "ERROR";
-                    return;
-                }                    
-                
+                // if(this.)
+
                 if(e.target.innerText === "=") {
+                    if(!this.operation || !this.operation.operator) {
+                        this.display.input = "ERROR";
+                        this.display.updateDisplayValue();
+                        return;
+                    }
+
                     this.operation.second = this.display.input;
                     
-                    this.display.input = this.operate(this.operation);
+                    let result = this.operate(this.operation);
+                    
+                    this.operation = this.operations.newOperation();
+                    this.display.input = this.operation.first = result;
+
                     this.display.updateDisplayValue();
                 } else {
                     this.operation.first = this.display.input;
@@ -65,6 +72,13 @@ class Calculator {
                     this.display.input = "";
                 }
             }
+        });
+
+        this.clear = document.querySelector(".clear");
+        this.clear.addEventListener("click", (e) => {
+            this.display.input = "";
+            this.operation = this.operations.newOperation();
+            this.display.updateDisplayValue();
         });
     }
 };
