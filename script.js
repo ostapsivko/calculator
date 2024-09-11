@@ -1,69 +1,99 @@
-let calculator = {
-    add: function (x, y) {
-        return x + y;
-    },
+class Calculator {
+    constructor () {
 
-    subtract: function (x, y) {
-        return x - y;
-    },
-
-    multiply: function(x, y) {
-        return x * y;
-    },
-
-    divide: function (x, y) {
-        return x / y;
-    },
-
-    operate: function (operation) {
-        switch(operation.operator) {
-            case "+":
-                return this.add(Number(operation.first), Number(operation.second));
-            case "-":
-                return this.subtract(Number(operation.first), Number(operation.second));
-            case "*":
-                return this.multiply(Number(operation.first), Number(operation.second));
-            case "/":
-                return this.divide(Number(operation.first), Number(operation.second));
-        }
-    },
+        this.add = function (x, y) {
+            return x + y;
+        };
+        this.subtract = function (x, y) {
+            return x - y;
+        };
     
-    updateDisplayValue: function (value) {
-        display.value = value;
-    },
+        this.multiply = function(x, y) {
+            return x * y;
+        };
+    
+        this.divide = function (x, y) {
+            return x / y;
+        };
+    
+        this.operate = function (operation) {
+            switch(operation.operator) {
+                case "+":
+                    return this.add(Number(operation.first), Number(operation.second));
+                case "-":
+                    return this.subtract(Number(operation.first), Number(operation.second));
+                case "*":
+                    return this.multiply(Number(operation.first), Number(operation.second));
+                case "/":
+                    return this.divide(Number(operation.first), Number(operation.second));
+            }
+        };
 
-    newOperation: function() {
-        return {
-            first: "",
-            second: "",
-            operator: "",
-        }
+        this.numbers = document.querySelector(".numbers");
+
+        this.numbers.addEventListener("click", (e) => {
+            if(e.target !== this.numbers) {
+                if(!this.operation)
+                    this.operation = this.operations.newOperation();
+                
+                this.display.input += e.target.innerText;
+                this.display.updateDisplayValue();
+            }
+        });
+
+        this.display = new Display();
+        this.operations = new Operations();
+        this.operation = this.operations.newOperation();
+
+        this.operations.element.addEventListener("click", (e) => {
+            if(e.target !== this.operations.element) {
+                if(!this.operation) {
+                    this.display.input = "ERROR";
+                    return;
+                }                    
+                
+                if(e.target.innerText === "=") {
+                    this.operation.second = this.display.input;
+                    
+                    this.display.input = this.operate(this.operation);
+                    this.display.updateDisplayValue();
+                } else {
+                    this.operation.first = this.display.input;
+                    
+                    this.display.input = this.operation.operator = e.target.innerText;
+                    this.display.updateDisplayValue();
+                    this.display.input = "";
+                }
+            }
+        });
     }
 };
 
-calculator.display = display = document.querySelector(".display");
-calculator.numbers = document.querySelector(".numbers");
-calculator.operations = document.querySelector(".operations");
-
-let input = "";
-let operation = calculator.newOperation();
-
-calculator.numbers.addEventListener("click", (e) => {
-    if(e.target !== calculator.numbers) {
-        input += e.target.innerText;
-        calculator.updateDisplayValue(input);
+class Operations {
+    constructor() {
+        this.element = document.querySelector(".operations");
+        this.newOperation = function() {
+            return new Operation();  
+        }
     }
-});
+}
 
-calculator.operations.addEventListener("click", (e) => {
-    if(e.target.innerText === "=") {
-        operation.second = input;
-        let result = calculator.operate(operation);
-        calculator.updateDisplayValue(result);
-    } else if(e.target !== calculator.operations) {
-        operation.first = input;
-        input = operation.operator = e.target.innerText;
-        calculator.updateDisplayValue(input);
-        input = "";
+class Operation {
+    constructor() {
+        this.first = "";
+        this.second = "";
+        this.operator = "";
     }
-});
+}
+
+class Display {
+    constructor() {
+        this.input = "";
+        this.element = document.querySelector(".display");
+        this.updateDisplayValue = function () {
+            this.element.value = this.input;
+        };
+    }
+}
+
+const calculator = new Calculator();
