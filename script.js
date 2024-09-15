@@ -1,31 +1,18 @@
 class Calculator {
     constructor () {
-
-        this.add = function (x, y) {
-            return x + y;
-        };
-        this.subtract = function (x, y) {
-            return x - y;
-        };
-    
-        this.multiply = function(x, y) {
-            return x * y;
-        };
-    
-        this.divide = function (x, y) {
-            return x / y;
-        };
-    
-        this.operate = function (operation) {
-            switch(operation.operator) {
+        this.operate = function (operation, operator) {
+            switch(operator) {
                 case "+":
-                    return this.add(Number(operation.first), Number(operation.second));
+                    return Number(operation.firstOperand) + Number(operation.secondOperand);
                 case "-":
-                    return this.subtract(Number(operation.first), Number(operation.second));
+                    return Number(operation.firstOperand) - Number(operation.secondOperand);
                 case "*":
-                    return this.multiply(Number(operation.first), Number(operation.second));
+                    return Number(operation.firstOperand) * Number(operation.secondOperand);
                 case "/":
-                    return this.divide(Number(operation.first), Number(operation.second));
+                    if(Number(operation.secondOperand) === 0)
+                        return "You tried to divide by zero. I hope you regret this."
+
+                    return Number(operation.firstOperand) / Number(operation.secondOperand);
             }
         };
 
@@ -35,8 +22,28 @@ class Calculator {
             if(e.target !== this.numbers) {
                 if(!this.operation)
                     this.operation = this.operations.newOperation();
-                
-                this.display.input += e.target.innerText;
+                                
+                if(this.operation.firstOperator === "") {
+                    if(this.display.input === "0") {
+                        //first input
+                        this.display.input = e.target.innerText;
+                    } else if(this.display.input === e.target.innerText) {
+                        //previous operation just completed
+                        this.display.input = e.target.innerText;
+                    } else {
+                        //first input continues
+                        this.display.input += e.target.innerText;
+                    }
+                } else if(this.operation.secondOperator === "") {
+                    if(this.display.input === this.operation.firstOperand) {
+                        //second input start
+                        this.display.input = e.target.innerText;
+                    } else {
+                        //second input continues
+                        this.display.input += e.target.innerText;
+                    }
+                }
+
                 this.display.updateDisplayValue();
             }
         });
@@ -57,26 +64,30 @@ class Calculator {
         }
 
         this.operations.element.addEventListener("click", (e) => {
+            if(e.target.classList.contains("equals")) {
+                //TODO handle '='
+                return;
+            }
+            
             if(e.target !== this.operations.element) {
-                if(e.target.innerText === "=") {
-                    if(!this.operation || !this.operation.operator) {
-                        this.display.input = "ERROR";
-                        this.display.updateDisplayValue();
-                        return;
-                    }
-
-                    this.handleOperationCompletion();
+                if(!this.operation) {
+                    this.display.input = "ERROR";
+                } else if(this.operation.firstOperator !== "" && this.operation.secondOperator === "") {
+                    this.operation.secondOperator = e.target.innerText;
+                    this.operation.secondOperand = this.display.input;
+                    this.display.input = this.operate(this.operation, this.operation.firstOperator);
+                    this.operation.firstOperand = this.display.input; 
+                } else if(this.operation.firstOperator !== "" && this.operation.secondOperator !== "") {
+                    this.operation.secondOperand = this.display.input;
+                    this.display.input = this.operate(this.operation, this.operation.secondOperator);
+                    this.operation.secondOperator = e.target.innerText;
+                    this.operation.firstOperand = this.display.input;
                 } else {
-                    if(this.operation.first) {
-                        this.handleOperationCompletion();
-                    } else {
-                        this.operation.first = this.display.input;
-                    }
-
-                    this.display.input = this.operation.operator = e.target.innerText;
-                    this.display.showOperationResult(`${this.operation.first} ${this.operation.operator} ${this.operation.second}`);
-                    this.display.input = "";
+                    this.operation.firstOperator = e.target.innerText;
+                    this.operation.firstOperand = this.display.input;
                 }
+
+                this.display.updateDisplayValue();
             }
         });
 
@@ -100,23 +111,25 @@ class Operations {
 
 class Operation {
     constructor() {
-        this.first = "";
-        this.second = "";
-        this.operator = "";
+        this.firstOperand = "";
+        this.secondOperand = "";
+        this.firstOperator = "";
+        this.secondOperator = "";
     }
 }
 
 class Display {
     constructor() {
-        this.input = "";
+        this.input = "0";
         this.element = document.querySelector(".display");
         this.updateDisplayValue = function () {
+            // if(this.input.length > 9)
+            //     this.input = this.input.substring(0, 9);
+
             this.element.value = this.input;
         };
 
-        this.showOperationResult = function(value) {
-            this.element.value = value;
-        } 
+        this.updateDisplayValue();
     }
 }
 
