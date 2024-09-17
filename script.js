@@ -125,7 +125,13 @@ class Display {
         this.input = "0";
         this.element = document.querySelector(".display");
         this.updateDisplayValue = function () {
-            this.element.value = this.input;
+            let value = this.input.toString();
+
+            if(value.length > 10) {
+                value = Number(value).toPrecision(10);
+            }
+            
+            this.element.value = value;
         };
 
         this.updateDisplayValue();
