@@ -19,7 +19,7 @@ class Calculator {
         this.numbers = document.querySelector(".numbers");
 
         this.numbers.addEventListener("click", (e) => {
-            if(e.target !== this.numbers) {
+            if(e.target.classList.contains("number")) {
                 if(!this.operation)
                     this.operation = this.operations.newOperation();
                                 
@@ -60,7 +60,7 @@ class Calculator {
                     this.display.updateDisplayValue(); 
                     this.operation.isNewOperand = true;
                 }
-            } else if(e.target !== this.operations.element) {
+            } else if(e.target.classList.contains("operator")) {
                 if(!this.operation) {
                     this.display.input = "ERROR";
                 } else if(this.operation.operator !== "") {
@@ -85,12 +85,17 @@ class Calculator {
                     this.operation.firstOperand = this.display.input;
                     this.operation.isNewOperand = true;
                 }
+            } else if(e.target.classList.contains("dot")) {
+                if(!this.display.input.includes(".")) {
+                    this.display.input += e.target.innerText;
+                    this.display.updateDisplayValue();
+                }
             }
         });
 
         this.clear = document.querySelector(".clear");
         this.clear.addEventListener("click", (e) => {
-            this.display.input = "";
+            this.display.input = "0";
             this.operation = this.operations.newOperation();
             this.display.updateDisplayValue();
         });
