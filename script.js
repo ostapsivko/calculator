@@ -99,6 +99,21 @@ class Calculator {
             this.operation = this.operations.newOperation();
             this.display.updateDisplayValue();
         });
+
+        this.delete = document.querySelector(".delete");
+        this.delete.addEventListener("click", (e) => {
+            let currentInput = this.display.input.toString();
+            let length = currentInput.length;
+            if(length > 0) {
+                this.display.input = currentInput.substring(0, length - 1);
+            } 
+            
+            if (this.display.input.length === 0) {
+                this.display.input = "0";
+            }
+
+            this.display.updateDisplayValue();
+        });
     }
 };
 
