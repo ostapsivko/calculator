@@ -88,6 +88,7 @@ class Calculator {
             } else if(e.target.classList.contains("dot")) {
                 if(!this.display.input.includes(".")) {
                     this.display.input += e.target.innerText;
+                    this.operation.isNewOperand = false;
                     this.display.updateDisplayValue();
                 }
             }
